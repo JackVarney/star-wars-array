@@ -1,6 +1,6 @@
 const createStarWarsIterator = target =>
   function*() {
-    if (target.length < 8) {
+    if (target.length <= 8) {
       throw new Error("There are 8 movies mate");
     }
 
