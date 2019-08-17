@@ -1,23 +1,14 @@
-const createStarWarsIterator = target =>
-  function*() {
-    if (target.length < 8) {
-      throw new Error("There are 8 movies mate");
-    }
-
-    yield target[3];
-    yield target[4];
-    yield target[5];
-    yield target[0];
-    yield target[1];
-    yield target[2];
-
-    var i = 5;
-    while (i < target.length - 1) {
-      i += 1;
-
-      yield target[i];
-    }
-  };
+const MOVIES = [
+  "The Phantom Menace",
+  "Attack of the Clones",
+  "Revenge of the Sith",
+  "A New Hope",
+  "The Empire Strikes Back",
+  "Return of the Jedi",
+  "The Force Awakens",
+  "The Last Jedi",
+  "The Rise of Skywalker"
+];
 
 class StarWarsArray {
   constructor(initialArray) {
@@ -36,16 +27,28 @@ class StarWarsArray {
             return target[1];
           case "5":
             return target[2];
-
           default: {
             const response = target[property];
 
             if (typeof response === "function") {
               return function(...args) {
-                target[Symbol.iterator] = createStarWarsIterator(target);
+                const newArr = [...target];
+
+                newArr[Symbol.iterator] = function*() {
+                  yield newArr[3];
+                  yield newArr[4];
+                  yield newArr[5];
+                  yield newArr[0];
+                  yield newArr[1];
+                  yield newArr[2];
+
+                  for (let i = 6; i < newArr.length; i += 1) {
+                    yield newArr[i];
+                  }
+                };
 
                 const value = Array.prototype[property].apply(
-                  new Array(...target),
+                  [...newArr],
                   args
                 );
 
@@ -56,26 +59,12 @@ class StarWarsArray {
             return response;
           }
         }
-      },
-      set(target, property, value) {
-        switch (property) {
-          case "0":
-            target[3] = value;
-          case "1":
-            target[4] = value;
-          case "2":
-            target[5] = value;
-          case "3":
-            target[0] = value;
-          case "4":
-            target[1] = value;
-          case "5":
-            target[2] = value;
-          default:
-            target[property] = value;
-        }
       }
     });
+  }
+
+  static getDefault() {
+    return new StarWarsArray([...MOVIES]);
   }
 }
 
